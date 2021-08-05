@@ -1,5 +1,7 @@
 package com.nowcoder.community.service;
 
+import com.nowcoder.community.dao.AlphaDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +11,9 @@ import javax.annotation.PreDestroy;
 @Service
 @Scope("singleton") // 默认是singleton，prototype每次获取均新实例化
 public class AlphaService {
+    @Autowired
+    private AlphaDao alphaDao;
+
     public AlphaService() {
         System.out.println("实例化AlphaService");
     }
@@ -21,5 +26,9 @@ public class AlphaService {
     @PreDestroy // 由容器管理销毁
     public void destroy() {
         System.out.println("销毁AlphaService");
+    }
+
+    public String find() {
+        return alphaDao.select();
     }
 }
