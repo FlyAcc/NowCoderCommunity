@@ -1,6 +1,7 @@
 package com.nowcoder.community;
 
 import com.nowcoder.community.dao.AlphaDao;
+import com.nowcoder.community.service.AlphaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,5 +31,15 @@ class CommunityApplicationTests implements ApplicationContextAware {
         System.out.println(alphaDao.select());
         alphaDao = applicationContext.getBean("alphaHibernate", AlphaDao.class); // 根据名字获取bean
         System.out.println(alphaDao.select());
+    }
+
+    @Test
+    void testBeanManagement() {
+        AlphaService alphaService = applicationContext.getBean(AlphaService.class);
+        System.out.println(alphaService);
+
+        // 被spring管理的bean，默认是单例
+        alphaService = applicationContext.getBean(AlphaService.class);
+        System.out.println(alphaService);
     }
 }
