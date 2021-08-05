@@ -9,6 +9,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @SpringBootTest
 @ContextConfiguration(classes = CommunityApplication.class) // 测试类和主类同个配置
 class CommunityApplicationTests implements ApplicationContextAware {
@@ -41,5 +44,11 @@ class CommunityApplicationTests implements ApplicationContextAware {
         // 被spring管理的bean，默认是单例
         alphaService = applicationContext.getBean(AlphaService.class);
         System.out.println(alphaService);
+    }
+
+    @Test
+    void testBeanConfig() {
+        SimpleDateFormat simpleDateFormat = applicationContext.getBean(SimpleDateFormat.class);
+        System.out.println(simpleDateFormat.format(new Date()));
     }
 }
