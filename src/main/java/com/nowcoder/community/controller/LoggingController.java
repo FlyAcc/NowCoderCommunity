@@ -2,22 +2,29 @@ package com.nowcoder.community.controller;
 
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.UserService;
+import com.nowcoder.community.util.CommunityConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Map;
 
 @Controller
-public class LoggingController {
+public class LoggingController implements CommunityConstant {
     @Autowired
     private UserService userService;
 
     @RequestMapping(path = "/register", method = RequestMethod.GET)
     public String getRegisterPage() {
         return "/site/register";
+    }
+
+    @RequestMapping(path = "/login", method = RequestMethod.GET)
+    public String getLoginPage() {
+        return "/site/login";
     }
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
@@ -32,5 +39,26 @@ public class LoggingController {
 
         map.forEach(model::addAttribute);
         return "site/register";
+    }
+
+    @RequestMapping(path = "/activation/{userId}/{code}", method = RequestMethod.GET)
+    public String activation(Model model, @PathVariable("userId") int userId, @PathVariable("code") String code) {
+        int result = userService.activation(userId, code);
+        switch (result) {
+            case ACTIVATION_SUCCESS:
+                model.addAttribute("msg", "激活成功！您的帐号已经可以正常使用！");
+                model.addAttribute("target", "/login");
+                break;
+            case ACTIVATION_REPEAT:
+                model.addAttribute("msg", "无效操作，该账号已经激活！");
+                model.addAttribute("target", "/index");
+                break;
+            default:
+                model.addAttribute("msg", "激活失败！您提供的激活码不正确！");
+                model.addAttribute("target", "/index");
+                break;
+        }
+
+        return "/site/operate-result";
     }
 }
