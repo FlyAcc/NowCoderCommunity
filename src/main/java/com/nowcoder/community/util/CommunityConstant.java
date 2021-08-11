@@ -6,4 +6,14 @@ public interface CommunityConstant {
     int ACTIVATION_REPEAT = 1;
 
     int ACTIVATION_FAILURE = 2;
+
+    /**
+     * 默认登陆超时时间
+     */
+    int DEFAULT_EXPIRED_SECOND = 3600 * 12;
+
+    /**
+     * 记住状态登陆超时时间
+     */
+    int REMEMBER_EXPIRED_SECOND = 3600 * 12 * 100;
 }
