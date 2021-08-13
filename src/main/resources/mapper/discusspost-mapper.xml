@@ -41,4 +41,11 @@
         insert into discuss_post(<include refid="insertFields"/>)
         values(#{userId}, #{title}, #{content}, #{type}, #{status}, #{createTime}, #{commentCount}, #{score})
     </insert>
+
+    <select id="selectDiscussPostById" resultType="DiscussPost">
+        select
+        <include refid="insertFields"/>
+        from discuss_post
+        where id = #{id}
+    </select>
 </mapper>
