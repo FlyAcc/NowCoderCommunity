@@ -16,4 +16,14 @@ public interface CommunityConstant {
      * 记住状态登陆超时时间
      */
     int REMEMBER_EXPIRED_SECOND = 3600 * 12 * 100;
+
+    /**
+     * 帖子
+     */
+    int ENTITY_TYPE_POST = 1;
+
+    /**
+     * 评论
+     */
+    int ENTITY_TYPE_COMMENT = 2;
 }
