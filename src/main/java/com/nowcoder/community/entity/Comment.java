@@ -8,8 +8,10 @@ public class Comment {
     // 评论的类型（回复帖子、回复评论、回复其他内容）
     // 所有地方的评论统一存储，使用该字段区分类型
     private int entityType;
+    // 具体是哪个评论
     private int entityId;
-    private int targetId; // 回复的对象，给评论的评论
+    // 回复的对象（若为评论的评论，则有一个回复对象）
+    private int targetId;
     private String content;
     private int status; // 0-正常
     private Date createTime;

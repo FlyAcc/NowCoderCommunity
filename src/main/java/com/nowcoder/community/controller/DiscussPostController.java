@@ -57,7 +57,7 @@ public class DiscussPostController implements CommunityConstant {
     comments: 回帖（list：包含评论对象map：commentViewObject）
         commentViewObject含四个字段：comment、user（回帖用户）、replyCount（回复数），replies（回复，即楼中楼）
             replies：楼层中用户相互的回复（list：包含回复对象map：replyViewObject）
-                replyViewObject含三个字段：user（回复主体）、reply（回复）、target（被回复的对象，直接回复层主则为null）
+                replyViewObject含三个字段：user（回复主体）、reply（回复）、target（被回复的对象，直接回复层主则没有target）
      */
     @RequestMapping(value = "/detail/{discussPostId}", method = RequestMethod.GET)
     public String getDiscussPost(@PathVariable("discussPostId") int discussPostId, Model model, Page page) {
@@ -85,7 +85,6 @@ public class DiscussPostController implements CommunityConstant {
                 Map<String, Object> commentViewObject = new HashMap<>();
                 commentViewObject.put("comment", comment);
                 commentViewObject.put("user", userService.findUserById(comment.getUserId()));
-
 
                 // 回复列表
                 List<Comment> replyList = commentService.findCommentsByEntity(
