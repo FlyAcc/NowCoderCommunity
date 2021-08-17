@@ -9,6 +9,7 @@ import com.nowcoder.community.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -59,5 +60,39 @@ public class MessageController {
         model.addAttribute("letterUnreadCount", letterUnreadCount);
 
         return "/site/letter";
+    }
+
+    @RequestMapping(path = "/letter/detail/{conversationId}", method = RequestMethod.GET)
+    public String getLetterDetail(@PathVariable("conversationId") String conversationId, Page page, Model model) {
+        // 分页信息
+        page.setLimit(5);
+        page.setPath("/letter/detail/" + conversationId);
+        page.setRows(messageService.findLetterCount(conversationId));
+
+
+        List<Message> letterList = messageService.findLetters(conversationId, page.getOffset(), page.getLimit());
+        List<Map<String, Object>> letters = new ArrayList<>();
+        if (letterList != null) {
+            for (Message letter : letterList) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("letter", letter);
+                map.put("fromUser", userService.findUserById(letter.getFromId()));
+                letters.add(map);
+            }
+        }
+        model.addAttribute("letters", letters);
+        model.addAttribute("target", getLetterTarget(conversationId));
+
+        return "/site/letter-detail";
+    }
+
+    /*
+    获取私信对象
+     */
+    private User getLetterTarget(String conversationId) {
+        User user = hostHolder.getUser();
+        String[] ids = conversationId.split("_");
+        int targetId = Integer.parseInt(ids[0].equals(user.getId() + "") ? ids[1] : ids[0]);
+        return userService.findUserById(targetId);
     }
 }
