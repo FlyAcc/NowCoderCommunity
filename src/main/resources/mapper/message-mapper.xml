@@ -11,6 +11,7 @@
         <include refid="selectFields"/>
         from message
         where id in (
+        -- 将消息通过conversation分组，然后取其中最新的消息
         select max(id) from message -- 最新的消息id越大
         where status != 2 -- 2:删除
         and from_id != 1 -- 1:系统（from_id为1的message指系统通知）
@@ -23,7 +24,7 @@
     <select id="selectConversationCount" resultType="int">
         select count(m.maxid)
         from (
-                 select max(id) as maxid
+                 select max(id) as maxid -- alias
                  from message
                  where status != 2
                    and from_id != 1
@@ -38,7 +39,7 @@
         where status !=2
         and from_id!=1
         and conversation_id = #{conversationId}
-        order by id desc
+        order by id desc -- 最新的在前面
         limit #{offset}, #{limit}
     </select>
     <select id="selectLetterCount" resultType="java.lang.Integer">
@@ -51,7 +52,7 @@
     <select id="selectLetterUnreadCount" resultType="java.lang.Integer">
         select count(id)
         from message
-        where status = 0
+        where status = 0 -- 未读
         and from_id != 1
         and to_id = #{userId}
         <if test="conversationId!=null">
