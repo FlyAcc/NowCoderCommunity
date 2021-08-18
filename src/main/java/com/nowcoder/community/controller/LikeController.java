@@ -22,10 +22,10 @@ public class LikeController {
 
     @RequestMapping(path = "/like", method = RequestMethod.POST)
     @ResponseBody
-    public String like(int entityType, int entityId) {
+    public String like(int entityType, int entityId, int entityUserId) {
         // 可以使用拦截器拦截未登录的点赞行为，后期会使用spring security统一做权限管理
         User user = hostHolder.getUser();
-        likeService.like(user.getId(), entityType, entityId);
+        likeService.like(user.getId(), entityType, entityId, entityUserId);
         long likeCount = likeService.findEntityLikeCount(entityType, entityId);
         int likeStatus = likeService.findEntityLikeStatus(user.getId(), entityType, entityId);
         Map<String, Object> map = new HashMap<>();
