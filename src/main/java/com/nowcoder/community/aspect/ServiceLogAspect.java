@@ -27,10 +27,12 @@ public class ServiceLogAspect {
     @Before("pointCut()")
     public void before(JoinPoint joinPoint) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
-        String ip = request.getRemoteHost();
-        String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        String target = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
-        LOGGER.info(String.format("用户[%s],在[%s],访问了[%s].", ip, now, target));
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            String ip = request.getRemoteHost();
+            String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            String target = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
+            LOGGER.info(String.format("用户[%s],在[%s],访问了[%s].", ip, now, target));
+        }
     }
 }

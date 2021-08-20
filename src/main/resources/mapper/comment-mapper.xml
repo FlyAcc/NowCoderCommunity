@@ -28,7 +28,13 @@
         select count(id)
         from comment
         where status = 0
-        and entity_type= #{entityType}
-        and entity_id = #{entityId}
+          and entity_type = #{entityType}
+          and entity_id = #{entityId}
+    </select>
+    <select id="selectCommentById" resultType="com.nowcoder.community.entity.Comment">
+        select
+        <include refid="selectFields"/>
+        from comment
+        where id={#id};
     </select>
 </mapper>
