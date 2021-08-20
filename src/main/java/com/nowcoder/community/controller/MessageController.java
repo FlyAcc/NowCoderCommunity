@@ -152,12 +152,25 @@ public class MessageController {
     }
 
     private Map<String, Object> buildNoticeViewObject(int userId, String topic) {
-        Message message = messageService.findLatestNotice(userId, topic);
+        Message notice = messageService.findLatestNotice(userId, topic);
+        Map<String, Object> noticeViewObject = buildNoticeViewObject(notice);
+        if (notice != null) {
+            int count = messageService.findNoticeCount(userId, topic);
+            noticeViewObject.put("count", count);
+
+            int unread = messageService.findNoticeUnreadCount(userId, topic);
+            noticeViewObject.put("unread", unread);
+        }
+
+        return noticeViewObject;
+    }
+
+    private Map<String, Object> buildNoticeViewObject(Message notice) {
         Map<String, Object> noticeViewObject = new HashMap<>();
-        if (message != null) {
-            noticeViewObject.put("message", message);
+        if (notice != null) {
+            noticeViewObject.put("notice", notice);
             // content为json字符串，由于一些特殊字符已被转译，因此需要还原回去
-            String content = HtmlUtils.htmlUnescape(message.getContent());
+            String content = HtmlUtils.htmlUnescape(notice.getContent());
             Map<String, Object> data = JSONObject.parseObject(content, HashMap.class);
 
             data.forEach((k, v) -> {
@@ -167,14 +180,36 @@ public class MessageController {
                     noticeViewObject.put(k, v);
                 }
             });
-
-            int count = messageService.findNoticeCount(userId, topic);
-            noticeViewObject.put("count", count);
-
-            int unread = messageService.findNoticeUnreadCount(userId, topic);
-            noticeViewObject.put("unread", unread);
         }
 
         return noticeViewObject;
+    }
+
+    @RequestMapping(path = "/notice/detail/{topic}", method = RequestMethod.GET)
+    public String getNoticeDetail(@PathVariable("topic") String topic, Page page, Model model) {
+        User user = hostHolder.getUser();
+
+        page.setLimit(5);
+        page.setPath("/notice/detail/" + topic);
+        page.setRows(messageService.findNoticeCount(user.getId(), topic));
+
+        List<Message> noticeList = messageService.findNotices(user.getId(), topic, page.getOffset(), page.getLimit());
+        List<Map<String, Object>> noticeViewObjects = new ArrayList<>();
+        if (noticeList != null) {
+            for (Message notice : noticeList) {
+                Map<String, Object> noticeViewObject = buildNoticeViewObject(notice);
+                noticeViewObject.put("fromUser", userService.findUserById(notice.getFromId()));
+                noticeViewObjects.add(noticeViewObject);
+            }
+        }
+        model.addAttribute("notices", noticeViewObjects);
+
+        // 标为已读
+        List<Integer> ids = getUnreadLetters(noticeList);
+        if (!ids.isEmpty()) {
+            messageService.readMessage(ids);
+        }
+
+        return "/site/notice-detail";
     }
 }
