@@ -54,6 +54,15 @@ public class CommentController {
         }
         eventProducer.fireEvent(event);
 
+        if (comment.getEntityType() == ENTITY_TYPE_POST) {
+            event = new Event()
+                    .setTopic(TOPIC_PUBLISH)
+                    .setUserId(comment.getUserId())
+                    .setEntityType(ENTITY_TYPE_POST)
+                    .setEntityId(discussPostId);
+            eventProducer.fireEvent(event);
+        }
+
         // TODO 回帖后跳转到回复的内容
         return "redirect:/discuss/detail/" + discussPostId;
     }

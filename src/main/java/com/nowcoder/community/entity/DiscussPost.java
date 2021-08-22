@@ -1,16 +1,34 @@
 package com.nowcoder.community.entity;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.Setting;
+
 import java.util.Date;
 
+@Setting(shards = 6, replicas = 3)
+@Document(indexName = "discusspost")
 public class DiscussPost {
+    @Id
     private int id;
+    @Field(type = FieldType.Integer)
     private int userId;
+    // analyzer:分词器，建立索引（存储）时尽可能多的分词（ik_max_word），搜索时智能分词ik_smart（避免出现过多无关结果）
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String title;
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
     private String content;
+    @Field(type = FieldType.Integer)
     private int type;
+    @Field(type = FieldType.Integer)
     private int status;
+    @Field(type = FieldType.Date)
     private Date createTime;
+    @Field(type = FieldType.Integer)
     private int commentCount;
+    @Field(type = FieldType.Double)
     private double score;
 
     public int getId() {
