@@ -50,12 +50,7 @@ public class DiscussPostController implements CommunityConstant {
         discussPostService.addDiscussPost(discussPost);
 
         // 触发发帖事件
-        Event event = new Event()
-                .setTopic(TOPIC_PUBLISH)
-                .setUserId(user.getId())
-                .setEntityId(discussPost.getId())
-                .setEntityType(ENTITY_TYPE_POST);
-        eventProducer.fireEvent(event);
+        fireDiscussPostEvent(user.getId(), discussPost.getId());
 
         // 异常将来用统一异常处理
         return CommunityUtil.getJsonString(0, "发布成功");
@@ -150,5 +145,63 @@ public class DiscussPostController implements CommunityConstant {
 
         model.addAttribute("comments", commentVoList);
         return "/site/discuss-detail";
+    }
+
+    // 置顶
+    @RequestMapping(path = "/top", method = RequestMethod.POST)
+    @ResponseBody
+    public String setTop(int id) {
+        return updatePost(id, -1, 1);
+    }
+
+    // 加精
+    @RequestMapping(path = "/wonderful", method = RequestMethod.POST)
+    @ResponseBody
+    public String setWonderful(int id) {
+        return updatePost(id, 1, -1);
+    }
+
+    // 删除
+    @RequestMapping(path = "/delete", method = RequestMethod.POST)
+    @ResponseBody
+    public String setDeleted(int id) {
+        discussPostService.updateStatus(id, 2);
+        Event event = new Event()
+                .setTopic(TOPIC_DELETE)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityId(id)
+                .setEntityType(ENTITY_TYPE_POST);
+        eventProducer.fireEvent(event);
+        return CommunityUtil.getJsonString(0);
+    }
+
+    /**
+     * 更新帖子类型或状态
+     *
+     * @param id     帖子id
+     * @param status 帖子状态：0-正常; 1-精华; 2-拉黑; -1-不进行设置
+     * @param type   帖子类型 0-普通; 1-置顶；-1-不进行设置
+     * @return 状态信息
+     */
+    private String updatePost(int id, int status, int type) {
+        if (status != -1) {
+            discussPostService.updateStatus(id, status);
+        }
+
+        if (type != -1) {
+            discussPostService.updateType(id, type);
+        }
+
+        fireDiscussPostEvent(hostHolder.getUser().getId(), id); // 更新elasticsearch中的索引
+        return CommunityUtil.getJsonString(0); // 成功状态，异步
+    }
+
+    private void fireDiscussPostEvent(int userId, int postId) {
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(userId)
+                .setEntityId(postId)
+                .setEntityType(ENTITY_TYPE_POST);
+        eventProducer.fireEvent(event);
     }
 }
