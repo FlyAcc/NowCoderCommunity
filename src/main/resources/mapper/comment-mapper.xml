@@ -35,6 +35,6 @@
         select
         <include refid="selectFields"/>
         from comment
-        where id={#id};
+        where id=#{id}
     </select>
 </mapper>

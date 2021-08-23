@@ -153,14 +153,16 @@ public class MessageController {
 
     private Map<String, Object> buildNoticeViewObject(int userId, String topic) {
         Message notice = messageService.findLatestNotice(userId, topic);
-        Map<String, Object> noticeViewObject = buildNoticeViewObject(notice);
-        if (notice != null) {
-            int count = messageService.findNoticeCount(userId, topic);
-            noticeViewObject.put("count", count);
-
-            int unread = messageService.findNoticeUnreadCount(userId, topic);
-            noticeViewObject.put("unread", unread);
+        if (notice == null) {
+            return null;
         }
+
+        Map<String, Object> noticeViewObject = buildNoticeViewObject(notice);
+        int count = messageService.findNoticeCount(userId, topic);
+        noticeViewObject.put("count", count);
+
+        int unread = messageService.findNoticeUnreadCount(userId, topic);
+        noticeViewObject.put("unread", unread);
 
         return noticeViewObject;
     }
